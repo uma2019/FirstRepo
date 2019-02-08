@@ -1,0 +1,105 @@
+//calculator with addition, subtraction, and multiplication.
+
+<!DOCTYPE html>
+    <html>
+        <head>
+            <script type="text/javascript" src="calculator.js"></script> 
+            <link rel="stylesheet" href="style.css" />
+        </head>
+        <body>
+        <form class="calcForm" name="calculator">
+            <input type="text" class="calcDisplay" id="display" />
+            <div class="calcRow">
+                <input type="button" class="calcButton" value="7" onclick="numInput('7')" />
+                <input type="button" class="calcButton" value="8" onclick="numInput('8')" />
+                <input type="button" class="calcButton" value="9" onclick="numInput('9')" />
+                <input type="button" class="calcButton" value="+" onclick="setOperation('add')" />
+            </div>
+            <div class="calcRow">
+                <input type="button" class="calcButton" value="4" onclick="numInput('4')" />
+                <input type="button" class="calcButton" value="5" onclick="numInput('5')" />
+                <input type="button" class="calcButton" value="6" onclick="numInput('6')" />
+                <input type="button" class="calcButton" value="-" onclick="setOperation('subtract')" />
+            </div>
+            <div class="calcRow">
+                <input type="button" class="calcButton" value="1" onclick="numInput('1')" />
+                <input type="button" class="calcButton" value="2" onclick="numInput('2')" />
+                <input type="button" class="calcButton" value="3" onclick="numInput('3')" />
+                <input type="button" class="calcButton" value="x" onclick="setOperation('multiply')" />
+            </div>
+            <div class="calcRow">
+                <input type="button" class="calcButton" value="0" onclick="numInput('0')" />
+                <input type="button" class="calcButton" value="." onclick="insertDecimal('.')" />
+                <input type="button" class="calcButton" value="C" onclick="clearDisplay()" />
+                <input type="button" class="calcButton" value="=" onclick="calculate()" />
+            </div>
+        </form>
+    </body>
+</html>
+
+
+function clearDisplay() {
+    var display = document.getElementById('display');
+    display.value = '0';
+    storedNum = '0';
+    calculationFinished = true;
+    operation = operations.none;
+}
+
+function clearPreviousResult() {
+    var display = document.getElementById('display');
+    if (calculationFinished) {
+        display.value = '0';
+        calculationFinished = false;
+    }
+}
+
+function numInput(digit) {
+    var display = document.getElementById('display');
+    clearPreviousResult();
+    // Get rid of a 0 if it's the only thing in there.
+    // This particular way of doing it lets you enter a 0 and have it show up,
+    // as well as leaving a 0 for the decimal point to snuggle up to.
+    if (display.value === '0') display.value = '';
+    display.value += digit;
+}
+
+function insertDecimal() {
+    var display = document.getElementById('display');
+    clearPreviousResult();
+    if (display.value.indexOf('.') === -1) display.value += '.';
+}
+
+operations = {
+    //  Takes the right side, and just returns it.  Since the right side is the
+    // display value, and calculate() sets display.value, this effectively makes
+    // calculate() say "display.value = +display.value".
+    none:     function(left, right) { return right; },
+
+    // Math ops.
+    add:      function(left, right) { return left + right; },
+    subtract: function(left, right) { return left - right; },
+    multiply: function(left, right) { return left * right; }
+};
+
+function setOperation(command) {
+    var display = document.getElementById('display');
+    calculate();
+    storedNum = display.value;
+    if (operations.hasOwnProperty(command))
+        operation = operations[command];
+}
+//select the calculator's display
+function calculate() {
+    var display = document.getElementById('display');
+    display.value = operation(+storedNum, +display.value);
+    calculationFinished = true;
+    operation = operations.none;
+}
+
+if ('addEventListener' in window)
+    window.addEventListener('load', clearDisplay);
+else
+    window.attachEvent('onload', clearDisplay);
+
+
